@@ -23,6 +23,16 @@ class ApacheAuthenticate extends BaseAuthenticate {
 	 * @param CakeResponse $response Unused response object.
 	 * @return mixed False on login failure. An array of User data on success.
 	 */
+
+	 /**
+	  * isUserMemberOf function
+	  * Looks up whether a user is in a group and returns the result
+	  * 
+	  * @param $group The group to check if the $ldapUserData is in
+	  * @param $ldapUserData The user to be checked if in $group
+	  *
+	  * @return Boolean $returnCode 
+	  */
 	private function isUserMemberOf($group, $ldapUserData) {
 	// return true of false depeding on if user is a member of group.
 		$returnCode = false;
@@ -37,6 +47,16 @@ class ApacheAuthenticate extends BaseAuthenticate {
 		return $returnCode;
 	}
 
+
+	/**
+	 * authenticate function
+	 * this function authenticates the user desiring to connect. It uses an LDAP Server.
+	 * 
+	 * @param CakeRequest $request //not used but necessary for overloading
+	 * @param CakeResponse $response //not used but necessary for overloading
+	 * 
+	 * @return User $user
+	 */
 	public function authenticate(CakeRequest $request, CakeResponse $response) {
 
 		// Get information user for MISP auth

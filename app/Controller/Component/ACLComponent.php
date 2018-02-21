@@ -447,12 +447,22 @@ class ACLComponent extends Component {
 			)
 	);
 
-	// The check works like this:
-	// If the user is a site admin, return true
-	// If the requested action has an OR-d list, iterate through the list. If any of the permissions are set for the user, return true
-	// If the requested action has an AND-ed list, iterate through the list. If any of the permissions for the user are not set, turn the check to false. Otherwise return true.
-	// If the requested action has a permission, check if the user's role has it flagged. If yes, return true
-	// If we fall through all of the checks, return an exception.
+	/**
+	 * checkAccess function
+	 * 
+	 * The check works like this:
+	 * If the user is a site admin, return true
+	 * If the requested action has an OR-d list, iterate through the list. If any of the permissions are set for the user, return true
+	 * If the requested action has an AND-ed list, iterate through the list. If any of the permissions for the user are not set, turn the check to false. Otherwise return true.
+	 * If the requested action has a permission, check if the user's role has it flagged. If yes, return true
+	 * If we fall through all of the checks, return an exception.
+	 * 
+	 * @param $user: The user to check the access for
+	 * @param $controller: The controller the $user tries to access
+	 * @param $action: The action the $user tries to perform through the controller
+	 * 
+	 * @return Boolean
+	 */ 
 	public function checkAccess($user, $controller, $action) {
 		if ($user['Role']['perm_site_admin']) return true;
 		if (!isset($this->__aclList[$controller])) $this->__error(404, 'Invalid controller.');
@@ -470,6 +480,16 @@ class ACLComponent extends Component {
 		$this->__error(403, 'You do not have permission to use this functionality.');
 	}
 
+
+	/**
+	 * __error function
+	 * a private function helping to throw an exception
+	 * 
+	 * @param $code: html error code, commonly used 404, 403
+	 * @param $message: a personalised message to complete the error thrown
+	 * 
+	 * @return void
+	 */
 	private function __error($code, $message) {
 		switch ($code) {
 			case 404:
@@ -482,6 +502,14 @@ class ACLComponent extends Component {
 		}
 	}
 
+	/**
+	 * __findAllFunctions function
+	 * a private function finding all functions for all controllers
+	 * 
+	 * @param void
+	 * 
+	 * @return array
+	 */
 	private function __findAllFunctions() {
 		$functionFinder = '/function[\s\n]+(\S+)[\s\n]*\(/';
 		$dir = new Folder(APP . 'Controller');
@@ -500,12 +528,28 @@ class ACLComponent extends Component {
 		return $results;
 	}
 
+	/**
+	 * printAllFunctionNames function
+	 * prints all the accessible functions available in all controllers
+	 * 
+	 * @param $content: default false but not used - due to overloading
+	 * 
+	 * @return array: keysorted
+	 */
 	public function printAllFunctionNames($content = false) {
 		$results = $this->__findAllFunctions();
 		ksort($results);
 		return $results;
 	}
 
+	/**
+	 * findMissingFunctionNames function
+	 * returns all the functions which are not in the __aclList to find the programmed functions that are not in the list
+	 * 
+	 * @param $content: defaults to false - not needed but used due to override
+	 * 
+	 * @return array: the missing functions - functions that are not in the __aclList
+	 */
 	public function findMissingFunctionNames($content = false) {
 		$results = $this->__findAllFunctions();
 		$missing = array();
@@ -519,6 +563,14 @@ class ACLComponent extends Component {
 		return $missing;
 	}
 
+	/**
+	 * printRoleAccess function
+	 * it doesn't actually print but return an array containing the role access.
+	 * 
+	 * @param $content: defaults to false - can take a Role ID to get the access for a certain role.
+	 * 
+	 * @return array: containing the role access.
+	 */
 	public function printRoleAccess($content = false) {
 		$results = array();
 		$this->Role = ClassRegistry::init('Role');
@@ -536,6 +588,13 @@ class ACLComponent extends Component {
 		return $results;
 	}
 
+	/**
+	 * __checkRoleAccess function
+	 * this is a private function that checks whether a $role has access to which actions and controllers.
+	 * 
+	 * @param $role: the role to check the access for
+	 * @return array: containing all controllers and actions that the role has access to
+	 */
 	private function __checkRoleAccess($role) {
 		$result = array();
 		foreach ($this->__aclList as $controller => $actions) {
